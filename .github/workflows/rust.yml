@@ -22,7 +22,7 @@ jobs:
               with:
                   command: check
                   args: --target=armv7a-vex-v5 -Zbuild-std=std,panic_abort -Zbuild-std-features=compiler-builtins-mem
-
+                  working-directory: kernel-rs
     test:
         name: Test
         runs-on: ubuntu-latest
