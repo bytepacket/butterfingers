@@ -1,40 +1,20 @@
-#![no_main]
+mod traits;
+use crate::traits::{IOFunc, TankExt};
 
 use vexide::prelude::*;
-use std::{cell::RefCell, rc::Rc, result};
+use std::{cell::RefCell, rc::Rc,};
 use evian::prelude::*;
 use evian::drivetrain::model::Differential;
 use evian::tracking::shared_motors;
 use vexide::smart::motor::{BrakeMode, MotorType};
 use vexide::smart::PortError;
 
-pub trait IOFunc: Tank {
-    fn intake_store(&mut self) -> Result<(), Self::Error>;
-
-    fn outtake_top(&mut self) -> Result<(), Self::Error>;
-
-    fn outtake_middle(&mut self) -> Result<(), Self::Error>;
-
-    fn outtake_bottom(&mut self) -> Result<(), Self::Error>;
-
-    fn stop_intake(&mut self) -> Result<(), Self::Error>;
-}
-
 struct Robot<> {}
-
-struct Drivetrain<> {
-    left: MotorType,
-    right: MotorType,
-}
 
 struct IO<> {
     front_bottom: Motor,
     middle: Motor,
     back_top: Motor,
-}
-
-pub trait TankExt: Tank {
-    fn brake_all(&mut self, mode: BrakeMode) -> Result<(), Self::Error>;
 }
 impl TankExt for Differential {
     fn brake_all(&mut self, mode: BrakeMode) -> Result<(), Self::Error> {
@@ -54,6 +34,121 @@ impl TankExt for Differential {
             }
         }
 
+        rtn
+    }
+
+    fn move_all(&mut self, speed: i32) -> Result<(), Self::Error> {
+        let mut rtn = Ok(());
+
+        for motor in self.left.borrow_mut().as_mut() {
+            let result = motor.set_velocity(speed);
+            if result.is_err() {
+                rtn = result;
+            }
+        }
+
+        for motor in self.right.borrow_mut().as_mut() {
+            let result = motor.set_velocity(speed);
+            if result.is_err() {
+                rtn = result;
+            }
+        }
+
+        rtn
+    }
+}
+
+impl IOFunc for IO {
+    fn intake_store(&mut self) -> Result<(), PortError> {
+        let mut rtn= Ok(());
+        let result= self.front_bottom.set_velocity(-600);
+        if result.is_err() {
+            rtn = result;
+        }
+        let result = self.middle.set_velocity(300);
+        if result.is_err() {
+            rtn = result;
+        }
+        let result = self.back_top.set_velocity(0);
+        if result.is_err() {
+            rtn = result;
+        }
+        rtn
+    }
+
+    fn outtake_top(&mut self) -> Result<(), PortError> {
+        let mut rtn = Ok(());
+        let result = self.front_bottom.set_velocity(-600);
+
+        if result.is_err() {
+            rtn = result
+        }
+        let result = self.middle.set_velocity(600);
+
+        if result.is_err() {
+            rtn = result
+        }
+        let result =self.back_top.set_velocity(600);
+        if result.is_err() {
+            rtn = result;
+        }
+        rtn
+    }
+
+    fn outtake_middle(&mut self) -> Result<(), PortError> {
+        let mut rtn = Ok(());
+        let result = self.front_bottom.set_velocity(-600);
+
+        if result.is_err() {
+            rtn = result
+        }
+        let result = self.middle.set_velocity(600);
+
+        if result.is_err() {
+            rtn = result
+        }
+        let result =self.back_top.set_velocity(-600);
+        if result.is_err() {
+            rtn = result;
+        }
+        rtn
+    }
+
+    fn outtake_bottom(&mut self) -> Result<(), PortError> {
+        let mut rtn = Ok(());
+        let result = self.front_bottom.set_velocity(600);
+
+        if result.is_err() {
+            rtn = result
+        }
+        let result = self.middle.set_velocity(-600);
+
+        if result.is_err() {
+            rtn = result
+        }
+        let result =self.back_top.set_velocity(0);
+        if result.is_err() {
+            rtn = result;
+        }
+        rtn
+    }
+
+    fn stop_intake(&mut self) -> Result<(), PortError> {
+        let mut rtn = Ok(());
+        let result = self.front_bottom.set_velocity(0);
+
+        if result.is_err() {
+            rtn = result
+        }
+        let result = self.middle.set_velocity(0);
+
+        if result.is_err() {
+            rtn = result
+        }
+        let result =self.back_top.set_velocity(0);
+        if result.is_err() {
+            rtn = result;
+        }
         rtn
     }
 }
