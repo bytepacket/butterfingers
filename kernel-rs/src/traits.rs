@@ -1,7 +1,12 @@
 use std::result;
-use evian::prelude::Tank;
 use vexide::smart::motor::BrakeMode;
 use vexide::smart::PortError;
+
+pub trait Asterisk {
+    async fn brake_all(&mut self, mode: BrakeMode) -> Result<(), PortError>;
+
+    async fn move_all(&mut self, fl: f64, fr: f64, bl: f64, br: f64, y: f64) -> Result<(), PortError>;
+}
 
 pub trait IOFunc {
     fn intake_store(&mut self) -> Result<(), PortError>;
@@ -15,8 +20,14 @@ pub trait IOFunc {
     fn stop_intake(&mut self) -> Result<(), PortError>;
 }
 
-pub trait TankExt: Tank {
-    fn brake_all(&mut self, mode: BrakeMode) -> Result<(), Self::Error>;
-
-    fn move_all(&mut self, rpm: i32) -> Result<(), Self::Error>;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HolonomicHeading {
+    North,
+    Northeast,
+    East,
+    Southeast,
+    South,
+    Southwest,
+    West,
+    Northwest,
 }
